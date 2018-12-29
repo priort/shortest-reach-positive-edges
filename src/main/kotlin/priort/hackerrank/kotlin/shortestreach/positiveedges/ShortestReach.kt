@@ -61,52 +61,46 @@ fun shortestReach(
     shortestReachCache: MutableMap<End, Int>,
     shortestButNotNecessarilyVisitedCache: MutableMap<End, Int>) {
 
-    fun calculateShortestReach() {
-        val alreadyVisited = mutableSetOf<Int>()
-        val toVisit =
-            PriorityQueue<NodeWithShortestReachSoFar>(numNodes, kotlin.Comparator { n1, n2 ->
-                n1.shortestReachSoFar.compareTo(n2.shortestReachSoFar)
-            })
-        toVisit.offer(NodeWithShortestReachSoFar(start, 0))
+    val alreadyVisited = mutableSetOf<Int>()
+    val toVisit =
+        PriorityQueue<NodeWithShortestReachSoFar>(numNodes, kotlin.Comparator { n1, n2 ->
+            n1.shortestReachSoFar.compareTo(n2.shortestReachSoFar)
+        })
+    toVisit.offer(NodeWithShortestReachSoFar(start, 0))
 
+    do {
+        val current = toVisit.poll()
 
-        do {
-            val current = toVisit.poll()
-
-            if (current.node !in alreadyVisited) {
-                if (current.node in ends) {
-                    val shortestReachSoFarToCurrent = shortestReachCache[current.node]
-                    if (shortestReachSoFarToCurrent == null) {
-                        shortestReachCache[current.node] = current.shortestReachSoFar
-                        shortestButNotNecessarilyVisitedCache[current.node] = current.shortestReachSoFar
-                    }
-                }
+        if (current.node !in alreadyVisited) {
+            if (current.node in ends) {
                 val shortestReachSoFarToCurrent = shortestReachCache[current.node]
                 if (shortestReachSoFarToCurrent == null) {
                     shortestReachCache[current.node] = current.shortestReachSoFar
+                    shortestButNotNecessarilyVisitedCache[current.node] = current.shortestReachSoFar
                 }
-                val children = graph[current.node] ?: emptyList()
-                children.forEach { child ->
-                    val reachToChild = current.shortestReachSoFar + child.length
-                    val shortestReachSoFarToChild = shortestReachCache[child.node]
-                    val shortestButNotNecessarilyVisitedForChild = shortestButNotNecessarilyVisitedCache[child.node]
-                    if ((shortestReachSoFarToChild == null || shortestReachSoFarToChild == reachToChild)
-                        && (shortestButNotNecessarilyVisitedForChild == null
-                                || shortestButNotNecessarilyVisitedForChild >= reachToChild)
-                    ) {
-
-                        toVisit.offer(NodeWithShortestReachSoFar(child.node, reachToChild))
-                    }
-                    shortestButNotNecessarilyVisitedCache[child.node] = reachToChild
-
-                }
-                alreadyVisited.add(current.node)
             }
+            val shortestReachSoFarToCurrent = shortestReachCache[current.node]
+            if (shortestReachSoFarToCurrent == null) {
+                shortestReachCache[current.node] = current.shortestReachSoFar
+            }
+            val children = graph[current.node] ?: emptyList()
+            children.forEach { child ->
+                val reachToChild = current.shortestReachSoFar + child.length
+                val shortestReachSoFarToChild = shortestReachCache[child.node]
+                val shortestButNotNecessarilyVisitedForChild = shortestButNotNecessarilyVisitedCache[child.node]
+                if ((shortestReachSoFarToChild == null || shortestReachSoFarToChild == reachToChild)
+                    && (shortestButNotNecessarilyVisitedForChild == null
+                            || shortestButNotNecessarilyVisitedForChild >= reachToChild)
+                ) {
 
-        } while (toVisit.isNotEmpty())
-    }
+                    toVisit.offer(NodeWithShortestReachSoFar(child.node, reachToChild))
+                }
+                shortestButNotNecessarilyVisitedCache[child.node] = reachToChild
 
-    calculateShortestReach()
+            }
+            alreadyVisited.add(current.node)
+        }
+    } while (toVisit.isNotEmpty())
 }
 
 fun main(args: Array<String>) {
