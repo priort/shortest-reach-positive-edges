@@ -118,7 +118,7 @@ fun main(args: Array<String>) {
         val edges = arrayListOf<Edge>()
         val parsedEdges = HashSet<Edge>()
 
-        for (i in 0 until m) {
+        for  (i in 0 until m) {
             val st2 = StringTokenizer(br.readLine())
 
             val edge = Edge(Integer.parseInt(st2.nextToken()), Integer.parseInt(st2.nextToken()), Integer.parseInt(st2.nextToken()))
